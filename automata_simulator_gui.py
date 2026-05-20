@@ -19,13 +19,14 @@ class AutomataSimulatorGUI:
         self.root.resizable(False, False)
 
         # Automata data structures
-        self.states = set()
-        self.alphabet = set()
-        self.start_state = None
-        self.accept_states = set()
-        self.transitions = {}  # (state, symbol) -> set of next states
-        self.is_dfa = True
-        self.automaton_type = "DFA"  # or "NFA"
+        self.states: set[str] = set()
+        self.alphabet: set[str] = set()
+        self.start_state: str = ""
+        self.accept_states: set[str] = set()
+        # (state, symbol) -> set of next states
+        self.transitions: dict[tuple[str, str], set[str]] = dict()
+        self.is_dfa: bool = True
+        self.automaton_type: str = "DFA"  # or "NFA"
 
         self.setup_ui()
 
@@ -140,19 +141,6 @@ class AutomataSimulatorGUI:
             row=0, column=2, padx=5
         )
 
-        # Regex to NFA
-        regex_frame = ttk.LabelFrame(
-            right_frame, text="Regular Expression", padding="5"
-        )
-        regex_frame.grid(row=1, column=0, sticky=(tk.W + tk.E), pady=10)
-
-        ttk.Label(regex_frame, text="Regex:").grid(row=0, column=0, pady=5)
-        self.regex_input = ttk.Entry(regex_frame, width=30)
-        self.regex_input.grid(row=0, column=1, padx=5, pady=5)
-        ttk.Button(regex_frame, text="Convert to NFA", command=self.regex_to_nfa).grid(
-            row=0, column=2, padx=5
-        )
-
         # String Generation
         gen_frame = ttk.LabelFrame(right_frame, text="String Generation", padding="5")
         gen_frame.grid(row=2, column=0, sticky=(tk.W + tk.E), pady=5)
@@ -195,6 +183,9 @@ class AutomataSimulatorGUI:
         self.status_bar.config(text=message[:50])
 
     def on_type_change(self, event=None):
+        if self.type_var.get() == self.automaton_type:
+            return  # No change
+
         self.automaton_type = self.type_var.get()
         self.is_dfa = self.automaton_type == "DFA"
         self.log(f"Automaton type changed to: {self.automaton_type}")
@@ -375,38 +366,6 @@ class AutomataSimulatorGUI:
             self.log(f"Result: {'✓ ACCEPTED' if accepted else '✗ REJECTED'}")
 
         self.sim_input.delete(0, tk.END)
-
-    def regex_to_nfa(self):
-        regex = self.regex_input.get().strip()
-        if not regex:
-            messagebox.showwarning("Warning", "Please enter a regular expression")
-            return
-
-        self.log(f"\n--- Converting Regex to NFA: {regex} ---")
-        self.log("Thompson's Construction Algorithm:")
-
-        # Simplified Thompson construction for basic regex
-        # This is a placeholder - you'll implement the actual algorithm
-        self.log("Step 1: Parse regex into tokens")
-        self.log("Step 2: Build NFA fragments for each subexpression")
-        self.log("Step 3: Combine fragments using ε-transitions")
-        self.log("Step 4: Set start and accept states")
-
-        # For now, just show a demo
-        self.log("\nGenerated NFA structure (simplified example for demo):")
-        self.log("  Start State: S0")
-        self.log("  Accept State: S3")
-        self.log("  Transitions:")
-        self.log("    S0 --ε--> S1")
-        self.log("    S1 --a--> S2")
-        self.log("    S2 --ε--> S3")
-
-        # In actual implementation, create NFA data structures here
-        self.automaton_type = "NFA"
-        self.is_dfa = False
-        self.log(f"\n✓ Created NFA from regex '{regex}'")
-
-        self.regex_input.delete(0, tk.END)
 
     def generate_strings(self):
         if not self.states or not self.start_state:
