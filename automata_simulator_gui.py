@@ -30,6 +30,8 @@ class AutomataSimulatorGUI:
 
         self.setup_ui()
 
+    # region setup_ui
+
     def setup_ui(self):
         # Main container
         main_frame = ttk.Frame(self.root, padding="10")
@@ -126,6 +128,11 @@ class AutomataSimulatorGUI:
             row=8, column=0, columnspan=3, pady=5
         )
 
+        # Reset button
+        ttk.Button(
+            left_frame, text="Reset Automaton", command=self.reset_automaton
+        ).grid(row=9, column=0, columnspan=3, pady=5)
+
         # Right Panel - Operations
         right_frame = ttk.LabelFrame(main_frame, text="Operations", padding="10")
         right_frame.grid(row=0, column=1, sticky=(tk.W + tk.E + tk.N + tk.S), padx=5)
@@ -176,11 +183,17 @@ class AutomataSimulatorGUI:
         output_frame.rowconfigure(0, weight=1)
         output_frame.columnconfigure(0, weight=1)
 
+    # endregion
+    # region log
+
     def log(self, message):
         """Add message to output area"""
         self.output_text.insert(tk.END, message + "\n")
         self.output_text.see(tk.END)
         self.status_bar.config(text=message[:50])
+
+    # endregion
+    # region on_type_change
 
     def on_type_change(self, event=None):
         if self.type_var.get() == self.automaton_type:
@@ -189,6 +202,9 @@ class AutomataSimulatorGUI:
         self.automaton_type = self.type_var.get()
         self.is_dfa = self.automaton_type == "DFA"
         self.log(f"Automaton type changed to: {self.automaton_type}")
+
+    # endregion
+    # region add_states
 
     def add_states(self):
         states_text = self.states_entry.get().strip()
@@ -200,12 +216,18 @@ class AutomataSimulatorGUI:
             )
             self.states_entry.delete(0, tk.END)
 
+    # endregion
+    # region set_alphabet
+
     def set_alphabet(self):
         alpha_text = self.alphabet_entry.get().strip()
         if alpha_text:
             self.alphabet = set(s.strip() for s in alpha_text.split(","))
             self.log(f"Alphabet set: {', '.join(self.alphabet)}")
             self.alphabet_entry.delete(0, tk.END)
+
+    # endregion
+    # region set_start
 
     def set_start(self):
         start = self.start_entry.get().strip()
@@ -215,6 +237,9 @@ class AutomataSimulatorGUI:
         else:
             messagebox.showerror("Error", f"State '{start}' not found in states list")
         self.start_entry.delete(0, tk.END)
+
+    # endregion
+    # region set_accept
 
     def set_accept(self):
         accept_text = self.accept_entry.get().strip()
@@ -226,6 +251,9 @@ class AutomataSimulatorGUI:
             else:
                 self.log(f"Accept states set to: {', '.join(self.accept_states)}")
         self.accept_entry.delete(0, tk.END)
+
+    # endregion
+    # region add_transition
 
     def add_transition(self):
         from_state = self.from_state.get().strip()
@@ -260,10 +288,16 @@ class AutomataSimulatorGUI:
         self.on_symbol.delete(0, tk.END)
         self.to_state.delete(0, tk.END)
 
+    # endregion
+    # region show_transitions
+
     def show_transitions(self):
         self.log("\n--- Current Transitions ---")
         for (state, symbol), targets in sorted(self.transitions.items()):
             self.log(f"{state} --{symbol}--> {', '.join(targets)}")
+
+    # endregion
+    # region validate_dfa
 
     def validate_dfa(self):
         if not self.is_dfa:
@@ -293,6 +327,9 @@ class AutomataSimulatorGUI:
                 self.log(f"  - {error}")
         else:
             self.log("✓ DFA Validation PASSED - Well-formed DFA!")
+
+    # endregion
+    # region simulate
 
     def simulate(self):
         input_string = self.sim_input.get().strip()
@@ -367,6 +404,9 @@ class AutomataSimulatorGUI:
 
         self.sim_input.delete(0, tk.END)
 
+    # endregion
+    # region generate_strings
+
     def generate_strings(self):
         if not self.states or not self.start_state:
             messagebox.showerror("Error", "Define automaton first")
@@ -413,6 +453,54 @@ class AutomataSimulatorGUI:
             self.log("Generating strings for NFA (simplified):")
             self.log("  Example strings (up to length 3): ε, a, b, aa, ab, ba, bb")
             # Full implementation would need BFS on NFA states
+
+    # endregion
+    # region reset_automaton
+
+    def reset_automaton(self):
+        confirm = messagebox.askyesno(
+            "Reset Confirmation", "Are you sure you want to reset the entire automaton?"
+        )
+
+        if not confirm:
+            return
+
+        # Reset automata data
+        self.states.clear()
+        self.alphabet.clear()
+        self.start_state = ""
+        self.accept_states.clear()
+        self.transitions.clear()
+
+        # Reset type
+        self.is_dfa = True
+        self.automaton_type = "DFA"
+        self.type_var.set("DFA")
+
+        # Clear all entry fields
+        self.states_entry.delete(0, tk.END)
+        self.alphabet_entry.delete(0, tk.END)
+        self.start_entry.delete(0, tk.END)
+        self.accept_entry.delete(0, tk.END)
+
+        self.from_state.delete(0, tk.END)
+        self.on_symbol.delete(0, tk.END)
+        self.to_state.delete(0, tk.END)
+
+        self.sim_input.delete(0, tk.END)
+
+        # Reset max length spinner
+        self.max_length.set(3)
+
+        # Clear output area
+        self.output_text.delete(1.0, tk.END)
+
+        # Reset status bar
+        self.status_bar.config(text="Ready")
+
+        self.log("✓ Automaton reset successfully")
+
+    # endregion
 
 
 # endregion
