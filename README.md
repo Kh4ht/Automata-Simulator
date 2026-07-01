@@ -97,15 +97,9 @@ python run.py
 
 ## Screenshots
 
-Add screenshots here.
+### Main Window
 
-Example:
-
-```markdown
 ![Main Window](screenshots/main-window.png)
-
-![Simulation](screenshots/simulation.png)
-```
 
 ---
 
