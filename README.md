@@ -52,7 +52,7 @@ AutomataSimulator/
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/AutomataSimulator.git
+git clone https://github.com/Kh4ht/Automata-Simulator.git
 ```
 
 Move into the project directory:
