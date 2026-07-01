@@ -148,6 +148,19 @@ class AutomataSimulatorGUI:
             row=0, column=2, padx=5
         )
 
+        # Regex to NFA
+        regex_frame = ttk.LabelFrame(
+            right_frame, text="Regular Expression", padding="5"
+        )
+        regex_frame.grid(row=1, column=0, sticky=(tk.W + tk.E), pady=10)
+
+        ttk.Label(regex_frame, text="Regex:").grid(row=0, column=0, pady=5)
+        self.regex_input = ttk.Entry(regex_frame, width=30)
+        self.regex_input.grid(row=0, column=1, padx=5, pady=5)
+        ttk.Button(regex_frame, text="Convert to NFA", command=self.regex_to_nfa).grid(
+            row=0, column=2, padx=5
+        )
+
         # String Generation
         gen_frame = ttk.LabelFrame(right_frame, text="String Generation", padding="5")
         gen_frame.grid(row=2, column=0, sticky=(tk.W + tk.E), pady=5)
@@ -263,10 +276,12 @@ class AutomataSimulatorGUI:
         if from_state not in self.states:
             messagebox.showerror("Error", f"State '{from_state}' not found")
             return
+
         if to_state not in self.states:
             messagebox.showerror("Error", f"State '{to_state}' not found")
             return
-        if symbol not in self.alphabet and symbol != "ε":
+
+        if symbol not in self.alphabet and symbol != "E":
             if messagebox.askyesno(
                 "Warning", f"Symbol '{symbol}' not in alphabet. Add it?"
             ):
@@ -423,7 +438,7 @@ class AutomataSimulatorGUI:
                 if length > max_len:
                     return
                 if current_state in self.accept_states and length <= max_len:
-                    strings.append(current_string if current_string else "ε")
+                    strings.append(current_string if current_string else "E")
 
                 for symbol in self.alphabet:
                     key = (current_state, symbol)
@@ -436,7 +451,7 @@ class AutomataSimulatorGUI:
             # Group by length
             strings_by_len = defaultdict(list)
             for s in strings:
-                if s == "ε":
+                if s == "E":
                     strings_by_len[0].append(s)
                 else:
                     strings_by_len[len(s)].append(s)
@@ -448,11 +463,6 @@ class AutomataSimulatorGUI:
                     )
 
             self.log(f"\nTotal: {len(strings)} strings")
-
-        else:
-            self.log("Generating strings for NFA (simplified):")
-            self.log("  Example strings (up to length 3): ε, a, b, aa, ab, ba, bb")
-            # Full implementation would need BFS on NFA states
 
     # endregion
     # region reset_automaton
@@ -499,6 +509,12 @@ class AutomataSimulatorGUI:
         self.status_bar.config(text="Ready")
 
         self.log("✓ Automaton reset successfully")
+
+    # endregion
+    # region build_regex_nfa
+
+    def regex_to_nfa(self):
+        pass  # Placeholder for regex to NFA conversion implementation
 
     # endregion
 
